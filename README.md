@@ -83,8 +83,9 @@ VITE_GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END
 ```
 
 Use the `private_key` value from the JSON key for `VITE_GOOGLE_PRIVATE_KEY`. Keep the PEM block's
-newline characters escaped as `\n` when storing it on one line. The app uses `google-auth-library`
-JWT auth with the read-only Sheets scope to request a bearer token for Google Sheets API v4 calls.
+newline characters escaped as `\n` when storing it on one line. The Vite dev/preview middleware uses
+`google-auth-library` JWT auth with the read-only Sheets scope to request a bearer token for Google
+Sheets API v4 calls.
 
 The app intentionally falls back to sample data until both service account environment variables are
 set.
@@ -96,7 +97,8 @@ npm install
 npm run dev
 ```
 
-Then open the local Vite URL printed in your terminal.
+Then open the local Vite URL printed in your terminal. Vite serves `/api/google-sheets-token` from
+Node middleware so the service account private key is not bundled into the browser.
 
 ## Production build
 
@@ -107,14 +109,17 @@ npm run preview
 
 ## Deployment
 
-Any static host that supports Vite apps works, including Netlify, Vercel, Cloudflare Pages, or S3.
+Use a host that can run the `/api/google-sheets-token` endpoint server-side, or add an equivalent
+serverless function that calls `server/googleSheetsAuth.js`. Static-only hosting will still build,
+but live private Sheet data will fall back to samples because no bearer token endpoint is available.
 
 General steps:
 
 1. Set `VITE_GOOGLE_SERVICE_ACCOUNT_EMAIL`.
 2. Set `VITE_GOOGLE_PRIVATE_KEY` with escaped newline characters (`\n`).
 3. Use `npm run build` as the build command.
-4. Publish the `dist` directory.
+4. Run `npm run preview` or an equivalent Node/serverless deployment that serves
+   `/api/google-sheets-token`.
 5. Confirm both private Google Sheets are shared with the service account email.
 
 ## Notes
@@ -123,5 +128,5 @@ General steps:
   monthly ranges are added to the sheet.
 - Route green/red standards are defined in `src/App.jsx` and can be tuned as franchise standards
   change.
-- Vite exposes `VITE_` variables to the browser bundle. For public deployments, move service account
-  token generation behind a trusted backend or serverless function.
+- Keep `VITE_GOOGLE_PRIVATE_KEY` on the server side. Do not reference it from React/client modules,
+  because `VITE_` variables used in client code are embedded in the browser bundle.

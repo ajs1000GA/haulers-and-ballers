@@ -1,56 +1,43 @@
-import { JWT } from 'google-auth-library'
 import { mockRoutes, mockTeammates } from '../data/mockData'
 import { parseNumber, parsePercent, safeDivide } from '../utils/formatters'
-
-export const GOOGLE_SERVICE_ACCOUNT_EMAIL = import.meta.env.VITE_GOOGLE_SERVICE_ACCOUNT_EMAIL || ''
-export const GOOGLE_PRIVATE_KEY = normalizePrivateKey(import.meta.env.VITE_GOOGLE_PRIVATE_KEY || '')
 
 export const TM_METRICS_SHEET_ID = '14qEXnzL1W0xEL-DAZcf9ydAvxgVJERMEVjUkZgPwkm8'
 export const ROUTES_SHEET_ID = '1_C4jslS4QvS3UAllwx-tIf-suhWsGvlHdpzFdAGsYTM'
 
-const SHEETS_READONLY_SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly'
+const GOOGLE_SHEETS_TOKEN_ENDPOINT = '/api/google-sheets-token'
 const TM_METRICS_RANGE = "'2TM Metrics'!D6:AH"
 const ROUTE_RANGES = [
   { side: 'Westside', tab: 'LIVE ROUTES', range: "'LIVE ROUTES'!A1:ZZ100", prefix: 'AW' },
   { side: 'Eastside', tab: 'East Routes', range: "'East Routes'!A1:ZZ100", prefix: 'AE' },
 ]
 
-let jwtClient
-
-export function hasConfiguredServiceAccount() {
-  return Boolean(GOOGLE_SERVICE_ACCOUNT_EMAIL && GOOGLE_PRIVATE_KEY)
-}
-
-function getJwtClient() {
-  if (!jwtClient) {
-    jwtClient = new JWT({
-      email: GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      key: GOOGLE_PRIVATE_KEY,
-      scopes: [SHEETS_READONLY_SCOPE],
-    })
-  }
-
-  return jwtClient
-}
+let tokenCache = { accessToken: '', expiresAt: 0 }
 
 async function getSheetsAccessToken() {
-  const tokenResponse = await getJwtClient().getAccessToken()
-  const token = typeof tokenResponse === 'string' ? tokenResponse : tokenResponse?.token
-
-  if (!token) {
-    throw new Error('Google service account JWT did not return an access token.')
+  if (tokenCache.accessToken && tokenCache.expiresAt > Date.now() + 60_000) {
+    return tokenCache.accessToken
   }
 
-  return token
+  const response = await fetch(GOOGLE_SHEETS_TOKEN_ENDPOINT)
+  if (!response.ok) {
+    const message = await response.text()
+    throw new Error(`Google Sheets auth failed (${response.status}): ${message}`)
+  }
+
+  const payload = await response.json()
+  if (!payload.accessToken) {
+    throw new Error('Google Sheets auth did not return an access token.')
+  }
+
+  tokenCache = {
+    accessToken: payload.accessToken,
+    expiresAt: payload.expiresAt ? new Date(payload.expiresAt).getTime() : Date.now() + 50 * 60_000,
+  }
+
+  return tokenCache.accessToken
 }
 
 async function fetchSheetValues(sheetId, range) {
-  if (!hasConfiguredServiceAccount()) {
-    throw new Error(
-      'Add VITE_GOOGLE_SERVICE_ACCOUNT_EMAIL and VITE_GOOGLE_PRIVATE_KEY to load live Google Sheets data.',
-    )
-  }
-
   const encodedRange = encodeURIComponent(range)
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodedRange}?majorDimension=ROWS`
   const accessToken = await getSheetsAccessToken()
@@ -70,17 +57,6 @@ async function fetchSheetValues(sheetId, range) {
 }
 
 export async function loadDashboardData() {
-  if (!hasConfiguredServiceAccount()) {
-    return {
-      teammates: mockTeammates,
-      routes: mockRoutes,
-      source: 'sample',
-      updatedAt: new Date(),
-      warning:
-        'Using sample data. Add VITE_GOOGLE_SERVICE_ACCOUNT_EMAIL and VITE_GOOGLE_PRIVATE_KEY to connect live Sheets.',
-    }
-  }
-
   try {
     const [metricsRows, ...routeRows] = await Promise.all([
       fetchSheetValues(TM_METRICS_SHEET_ID, TM_METRICS_RANGE),
@@ -206,12 +182,6 @@ export function parseRouteSheet(routeConfig) {
 
 function cleanCell(value) {
   return String(value || '').trim()
-}
-
-function normalizePrivateKey(value) {
-  return String(value || '')
-    .replace(/\\n/g, '\n')
-    .trim()
 }
 
 function findRouteCode(rows, columnIndex, prefix) {
