@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap');
+@import 'tailwindcss';
+
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color-scheme: dark;
+  background: #07111f;
+  color: #f7fbff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.score-font {
+  font-family: Rajdhani, Inter, system-ui, sans-serif;
+}
+
+.dashboard-shell {
+  --page-bg: #07111f;
+  --panel: rgba(10, 23, 41, 0.86);
+  --panel-strong: rgba(12, 28, 52, 0.96);
+  --panel-soft: rgba(255, 255, 255, 0.06);
+  --border: rgba(125, 164, 208, 0.18);
+  --text: #f7fbff;
+  --muted: #9fb5cf;
+  --muted-strong: #c8d8ea;
+  --orange: #ff7a1a;
+  --orange-soft: rgba(255, 122, 26, 0.18);
+  --blue: #1f9bff;
+  --blue-soft: rgba(31, 155, 255, 0.16);
+  --green: #28d17c;
+  --green-soft: rgba(40, 209, 124, 0.16);
+  --yellow: #ffd166;
+  --yellow-soft: rgba(255, 209, 102, 0.18);
+  --red: #ff5364;
+  --red-soft: rgba(255, 83, 100, 0.16);
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(255, 122, 26, 0.28), transparent 28rem),
+    radial-gradient(circle at top right, rgba(31, 155, 255, 0.24), transparent 34rem),
+    linear-gradient(135deg, #07111f 0%, #09172a 45%, #03101d 100%);
+}
+
+.dashboard-shell.light-dashboard {
+  --page-bg: #f5f8fc;
+  --panel: rgba(255, 255, 255, 0.9);
+  --panel-strong: rgba(255, 255, 255, 0.98);
+  --panel-soft: rgba(9, 23, 42, 0.05);
+  --border: rgba(13, 38, 70, 0.14);
+  --text: #0a1729;
+  --muted: #5c6f86;
+  --muted-strong: #263d57;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(255, 122, 26, 0.24), transparent 26rem),
+    radial-gradient(circle at top right, rgba(31, 155, 255, 0.2), transparent 32rem),
+    linear-gradient(135deg, #f8fbff 0%, #edf5ff 50%, #f7f4ef 100%);
+}
+
+.scoreboard-card {
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--panel-strong), var(--panel));
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(18px);
+}
+
+.glass-panel {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  backdrop-filter: blur(16px);
+}
+
+.diagonal-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.08) 0,
+    rgba(255, 255, 255, 0.08) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+.accent-border {
+  border-image: linear-gradient(90deg, var(--orange), var(--blue)) 1;
+}
+
+.metric-tile {
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgba(255, 122, 26, 0.1), transparent 34%),
+    linear-gradient(315deg, rgba(31, 155, 255, 0.12), transparent 42%),
+    var(--panel-soft);
+}
+
+.badge-green {
+  color: #b7ffd8;
+  background: var(--green-soft);
+  border-color: rgba(40, 209, 124, 0.42);
+}
+
+.badge-yellow {
+  color: #ffe9a6;
+  background: var(--yellow-soft);
+  border-color: rgba(255, 209, 102, 0.42);
+}
+
+.badge-red {
+  color: #ffc6cc;
+  background: var(--red-soft);
+  border-color: rgba(255, 83, 100, 0.42);
+}
+
+.light-dashboard .badge-green {
+  color: #08733d;
+}
+
+.light-dashboard .badge-yellow {
+  color: #805a00;
+}
+
+.light-dashboard .badge-red {
+  color: #a30d22;
+}
+
+.leader-row {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.leader-row:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 122, 26, 0.5);
+}
+
+.table-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(127, 154, 186, 0.35);
+  border-radius: 999px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: rgba(127, 154, 186, 0.08);
+}

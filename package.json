@@ -1,0 +1,39 @@
+{
+  "name": "haulers-and-ballers",
+  "version": "1.0.0",
+  "description": "Haulers & Ballers dashboard for Atlanta franchise leaderboard and live route tracking.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajs1000GA/haulers-and-ballers.git"
+  },
+  "keywords": [
+    "react",
+    "vite",
+    "dashboard",
+    "google-sheets"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ajs1000GA/haulers-and-ballers/issues"
+  },
+  "homepage": "https://github.com/ajs1000GA/haulers-and-ballers#readme",
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "recharts": "^3.8.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "@vitejs/plugin-react": "^6.0.2",
+    "tailwindcss": "^4.3.0",
+    "vite": "^8.0.16"
+  }
+}
