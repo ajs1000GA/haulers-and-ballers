@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/ajs1000GA/haulers-and-ballers#readme",
   "dependencies": {
+    "google-auth-library": "^10.7.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "recharts": "^3.8.1"

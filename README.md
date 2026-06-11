@@ -20,7 +20,7 @@ leaderboard with a live daily route tracker using Google Sheets API v4.
 - Profile modal with full stats, achievements, rank, score, and trend chart
 - Live Today route tracker for Westside `AW` and Eastside `AE` routes
 - Team totals banner and 60-second auto-refresh
-- Sample fallback data when the API key is still the placeholder
+- Sample fallback data when service account credentials are missing
 
 ## Google Sheets sources
 
@@ -71,19 +71,23 @@ Each route column is parsed for:
 ## Google Sheets API setup
 
 1. In Google Cloud Console, enable **Google Sheets API**.
-2. Create an API key.
-3. Restrict the key to Google Sheets API and your deployed domain when possible.
-4. Make sure the two Google Sheets are readable by the key. Common approaches:
-   - Publish/read-only share the sheets as appropriate for your organization.
-   - Use domain-level access if deployed behind an internal account boundary.
+2. Use the service account
+   `haulers-ballers-reader@haulers-and-ballers.iam.gserviceaccount.com`.
+3. Share both private Google Sheets with that service account email as a viewer.
+4. Create or retrieve a JSON key for the service account.
 5. Create a local `.env` file:
 
 ```bash
-VITE_GOOGLE_SHEETS_API_KEY=YOUR_GOOGLE_SHEETS_API_KEY
+VITE_GOOGLE_SERVICE_ACCOUNT_EMAIL=haulers-ballers-reader@haulers-and-ballers.iam.gserviceaccount.com
+VITE_GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----\n"
 ```
 
-Replace `YOUR_GOOGLE_SHEETS_API_KEY` with the real key. The app intentionally falls back to sample
-data until the placeholder is replaced.
+Use the `private_key` value from the JSON key for `VITE_GOOGLE_PRIVATE_KEY`. Keep the PEM block's
+newline characters escaped as `\n` when storing it on one line. The app uses `google-auth-library`
+JWT auth with the read-only Sheets scope to request a bearer token for Google Sheets API v4 calls.
+
+The app intentionally falls back to sample data until both service account environment variables are
+set.
 
 ## Local development
 
@@ -107,10 +111,11 @@ Any static host that supports Vite apps works, including Netlify, Vercel, Cloudf
 
 General steps:
 
-1. Set the environment variable `VITE_GOOGLE_SHEETS_API_KEY`.
-2. Use `npm run build` as the build command.
-3. Publish the `dist` directory.
-4. Confirm the deployed domain is allowed by your Google API key restrictions.
+1. Set `VITE_GOOGLE_SERVICE_ACCOUNT_EMAIL`.
+2. Set `VITE_GOOGLE_PRIVATE_KEY` with escaped newline characters (`\n`).
+3. Use `npm run build` as the build command.
+4. Publish the `dist` directory.
+5. Confirm both private Google Sheets are shared with the service account email.
 
 ## Notes
 
@@ -118,3 +123,5 @@ General steps:
   monthly ranges are added to the sheet.
 - Route green/red standards are defined in `src/App.jsx` and can be tuned as franchise standards
   change.
+- Vite exposes `VITE_` variables to the browser bundle. For public deployments, move service account
+  token generation behind a trusted backend or serverless function.
