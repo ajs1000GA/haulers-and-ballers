@@ -5,6 +5,7 @@ export const TM_METRICS_SHEET_ID = '14qEXnzL1W0xEL-DAZcf9ydAvxgVJERMEVjUkZgPwkm8
 export const ROUTES_SHEET_ID = '1_C4jslS4QvS3UAllwx-tIf-suhWsGvlHdpzFdAGsYTM'
 
 const GOOGLE_SHEETS_TOKEN_ENDPOINT = '/api/google-sheets-token'
+const STATIC_SHEETS_DISABLED = import.meta.env.VITE_DISABLE_SHEETS_TOKEN === 'true'
 const TM_METRICS_RANGE = "'2TM Metrics'!D6:AH"
 const ROUTE_RANGES = [
   { side: 'Westside', tab: 'LIVE ROUTES', range: "'LIVE ROUTES'!A1:ZZ100", prefix: 'AW' },
@@ -14,6 +15,10 @@ const ROUTE_RANGES = [
 let tokenCache = { accessToken: '', expiresAt: 0 }
 
 async function getSheetsAccessToken() {
+  if (STATIC_SHEETS_DISABLED) {
+    throw new Error('Live Google Sheets are disabled for this static deployment.')
+  }
+
   if (tokenCache.accessToken && tokenCache.expiresAt > Date.now() + 60_000) {
     return tokenCache.accessToken
   }

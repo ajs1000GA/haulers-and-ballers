@@ -6,8 +6,10 @@ import { createSheetsTokenMiddleware } from './server/googleSheetsAuth.js'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const sheetsTokenMiddleware = createSheetsTokenMiddleware(env)
+  const base = env.VITE_BASE_PATH || '/'
 
   return {
+    base,
     plugins: [
       react(),
       tailwindcss(),

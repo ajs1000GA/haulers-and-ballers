@@ -109,6 +109,28 @@ npm run preview
 
 ## Deployment
 
+### GitHub Pages
+
+This repository includes a GitHub Actions workflow at `.github/workflows/deploy-pages.yml` that
+builds and publishes the static app to GitHub Pages when changes land on `main`. It sets the Vite
+base path to `/haulers-and-ballers/`, so the published site URL is:
+
+```text
+https://ajs1000GA.github.io/haulers-and-ballers/
+```
+
+The Pages build also sets `VITE_DISABLE_SHEETS_TOKEN=true`. GitHub Pages cannot run the
+`/api/google-sheets-token` server endpoint, so the static deployment intentionally uses sample data
+and displays a short warning until the app is hosted somewhere with server-side API support.
+
+To build locally with the same static Pages settings:
+
+```bash
+VITE_BASE_PATH=/haulers-and-ballers/ VITE_DISABLE_SHEETS_TOKEN=true npm run build
+```
+
+### Server-side host
+
 Use a host that can run the `/api/google-sheets-token` endpoint server-side, or add an equivalent
 serverless function that calls `server/googleSheetsAuth.js`. Static-only hosting will still build,
 but live private Sheet data will fall back to samples because no bearer token endpoint is available.
